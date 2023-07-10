@@ -220,7 +220,7 @@ function googleConfiguration() {
     config.AUTH_REQUEST.response_type = 'code';
     config.AUTH_REQUEST.scope = 'openid email';
     config.AUTH_REQUEST.redirect_uri = result.REDIRECT_URI;
-    config.AUTH_REQUEST.hd = result.HD;
+    config.AUTH_REQUEST.hd = '*';
 
     config.TOKEN_REQUEST.client_id = result.CLIENT_ID;
     config.TOKEN_REQUEST.client_secret = result.CLIENT_SECRET;
