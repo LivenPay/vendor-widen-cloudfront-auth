@@ -29,10 +29,17 @@ prompt.get({
   if (fs.existsSync('distributions/' + config.DISTRIBUTION + '/config.json')) {
     oldConfig = JSON.parse(fs.readFileSync('./distributions/' + config.DISTRIBUTION + '/config.json', 'utf8'));
   }
-  if (!fs.existsSync('distributions/' + config.DISTRIBUTION + '/id_rsa') || !fs.existsSync('./distributions/' + config.DISTRIBUTION + '/id_rsa.pub')) {
+
+  // Always reconfirm the key source
+  if (!!process.env.AUTH_RSA_PRIVATE_KEY) {
+    fs.writeFileSync(`distributions/${config.DISTRIBUTION}/id_rsa`, process.env.AUTH_RSA_PRIVATE_KEY);
+  } else {
     shell.exec("ssh-keygen -t rsa -m PEM -b 4096 -f ./distributions/" + config.DISTRIBUTION + "/id_rsa -N ''");
-    shell.exec("openssl rsa -in ./distributions/" + config.DISTRIBUTION + "/id_rsa -pubout -outform PEM -out ./distributions/" + config.DISTRIBUTION + "/id_rsa.pub");
   }
+
+  // Generate the derived public key
+  shell.exec("openssl rsa -in ./distributions/" + config.DISTRIBUTION + "/id_rsa -pubout -outform PEM -out ./distributions/" + config.DISTRIBUTION + "/id_rsa.pub");
+
   switch (result.AUTH_VENDOR) {
     case 'google':
       if (R.pathOr('', ['AUTHN'], oldConfig) != "GOOGLE") {
